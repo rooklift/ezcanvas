@@ -147,8 +147,22 @@ func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode string) {
     }
 }
 
+func (c *Canvas) AddCanvas(other *Canvas, mode string) {
+    if c.width != other.width || c.height != other.height {
+        panic("dimensions did not match for AddCanvas")
+    }
+
+    for x := 0 ; x < c.width ; x++ {
+        for y := 0 ; y < c.height ; y++ {
+            r, g, b := other.Get(x, y)
+            c.Add(x, y, r, g, b)
+        }
+    }
+}
+
+
 func (c *Canvas) DumpPNG(filename string) error {
-    outfile, err := os.Create("test.png")
+    outfile, err := os.Create(filename)
     if err != nil {
         return fmt.Errorf("Couldn't create output file '%s'", filename)
     }
