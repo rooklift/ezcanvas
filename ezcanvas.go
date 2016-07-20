@@ -147,7 +147,7 @@ func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode string) {
     }
 }
 
-func (c *Canvas) AddCanvas(other *Canvas, mode string) {
+func (c *Canvas) AddCanvas(other *Canvas) {
     if c.width != other.width || c.height != other.height {
         panic("dimensions did not match for AddCanvas")
     }
