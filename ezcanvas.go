@@ -120,8 +120,8 @@ func (c *Canvas) Fcircle(x, y, radius int, r, g, b uint8, mode int) {
         for i := radius ; i >= 0 ; i-- {
             pyth = math.Sqrt(math.Pow(float64(i), 2) + math.Pow(float64(j), 2));
             if (pyth < float64(radius) - 0.5) {
-                c.LineHorizontal(x - i - 1, y - j - 1, x + i, r, g, b, mode)
-                c.LineHorizontal(x - i - 1, y + j, x + i, r, g, b, mode)
+                c.lineHorizontal(x - i - 1, y - j - 1, x + i, r, g, b, mode)
+                c.lineHorizontal(x - i - 1, y + j, x + i, r, g, b, mode)
                 break
             }
         }
