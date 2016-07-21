@@ -7,4 +7,3 @@ TODO:
 
 * Empty circle
 * Empty rectangle
-* Various straight lines
