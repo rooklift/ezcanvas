@@ -22,7 +22,7 @@ const (
 )
 
 type Canvas struct {
-    field *image.NRGBA
+    field *image.NRGBA          // When field.At() is called it returns a color.NRGBA, which we can type assert
     width int
     height int
 }
@@ -30,7 +30,7 @@ type Canvas struct {
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
         at := c.field.At(x, y)
-        r, g, b := at.(color.NRGBA).R, at.(color.NRGBA).G, at.(color.NRGBA).B   // at.(color.NRGBA) is a type assertion
+        r, g, b := at.(color.NRGBA).R, at.(color.NRGBA).G, at.(color.NRGBA).B   // (color.NRGBA) is the aforementioned type assertion
         return r, g, b
     }
     return 0, 0, 0
@@ -112,6 +112,23 @@ func (c *Canvas) Frect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
         }
     }
 }
+
+func (c *Canvas) Rect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+
+    if x1 > x2 {
+        x1, x2 = x2, x1
+    }
+
+    if y1 > y2 {
+        y1, y2 = y2, y1
+    }
+
+    c.lineHorizontal(x1, y1, x2, r, g, b, mode)
+    c.lineHorizontal(x1, y2, x2, r, g, b, mode)
+    c.lineVertical(x1, y1, y2, r, g, b, mode)
+    c.lineVertical(x2, y1, y2, r, g, b, mode)
+
+}    
 
 func (c *Canvas) Fcircle(x, y, radius int, r, g, b uint8, mode int) {
     var pyth float64;
