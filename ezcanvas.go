@@ -11,14 +11,20 @@ import (
     "os"
 )
 
+const (
+    SET = 0
+    REPLACE = 0
+
+    ADD = 1
+
+    SUBTRACT = 2
+    SUB = 2
+)
+
 type Canvas struct {
     field *image.NRGBA
     width int
     height int
-}
-
-func (c *Canvas) Set(x, y int, r, g, b uint8) {
-    c.field.Set(x, y, color.NRGBA{r, g, b, 255})
 }
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
@@ -30,14 +36,20 @@ func (c *Canvas) Get(x, y int) (r, g, b uint8) {
     return 0, 0, 0
 }
 
-func (c *Canvas) Clear(r, g, b uint8) {
-    col := color.NRGBA{r, g, b, 255}
-
-    for x := 0 ; x < c.width ; x++ {
-        for y := 0 ; y < c.height ; y++ {
-            c.field.Set(x, y, col)
-        }
+func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
+    if mode == SET {
+        c.field.Set(x, y, color.NRGBA{r, g, b, 255})        // Optimise by using the image library's built-in Set()
+    } else if mode == ADD {
+        c.Add(x, y, r, g, b)
+    } else if mode == SUBTRACT {
+        c.Subtract(x, y, r, g, b)
+    } else {
+        panic("unknown mode")
     }
+}
+
+func (c *Canvas) Set(x, y int, r, g, b uint8) {
+    c.field.Set(x, y, color.NRGBA{r, g, b, 255})
 }
 
 func (c *Canvas) Add(x, y int, r, g, b uint8) {
@@ -74,7 +86,17 @@ func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
     c.field.Set(x, y, color.NRGBA{new_r, new_g, new_b, 255})
 }
 
-func (c *Canvas) Frect(left, top, right, bottom int, r, g, b uint8, mode string) {
+func (c *Canvas) Clear(r, g, b uint8) {
+    col := color.NRGBA{r, g, b, 255}
+
+    for x := 0 ; x < c.width ; x++ {
+        for y := 0 ; y < c.height ; y++ {
+            c.field.Set(x, y, col)
+        }
+    }
+}
+
+func (c *Canvas) Frect(left, top, right, bottom int, r, g, b uint8, mode int) {
 
     if left > right {
         left, right = right, left
@@ -84,31 +106,14 @@ func (c *Canvas) Frect(left, top, right, bottom int, r, g, b uint8, mode string)
         top, bottom = bottom, top
     }
 
-    if mode == "add" {
-        for x := left ; x < right ; x++ {
-            for y := top ; y < bottom ; y++ {
-                c.Add(x, y, r, g, b)
-            }
+    for x := left ; x < right ; x++ {
+        for y := top ; y < bottom ; y++ {
+            c.SetByMode(x, y, r, g, b, mode)
         }
-    } else if mode == "subtract" {
-        for x := left ; x < right ; x++ {
-            for y := top ; y < bottom ; y++ {
-                c.Subtract(x, y, r, g, b)
-            }
-        }
-    } else if mode == "set" {
-        col := color.NRGBA{r, g, b, 255}
-        for x := left ; x < right ; x++ {
-            for y := top ; y < bottom ; y++ {
-                c.field.Set(x, y, col)          // Optimise by using the image library's built-in Set()
-            }
-        }
-    } else {
-        panic("unknown mode")
     }
 }
 
-func (c *Canvas) Fcircle (x, y, radius int, r, g, b uint8, mode string) {
+func (c *Canvas) Fcircle(x, y, radius int, r, g, b uint8, mode int) {
     var pyth float64;
 
     for j := radius; j >= 0 ; j-- {
@@ -123,53 +128,120 @@ func (c *Canvas) Fcircle (x, y, radius int, r, g, b uint8, mode string) {
     }
 }
 
-func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode string) {
+func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode int) {
 
     if x1 > x2 {
         x1, x2 = x2, x1
     }
 
-    if mode == "set" {
-        col := color.NRGBA{r, g, b, 255}
-        for x := x1 ; x <= x2 ; x++ {
-            c.field.Set(x, y, col)          // Optimise by using the image library's built-in Set()
-        }
-    } else if mode == "add" {
-        for x := x1 ; x <= x2 ; x++ {
-            c.Add(x, y, r, g, b)
-        }
-    } else if mode == "subtract" {
-        for x := x1 ; x <= x2 ; x++ {
-            c.Subtract(x, y, r, g, b)
-        }
-    } else {
-        panic("unknown mode")
+    for x := x1 ; x <= x2 ; x++ {
+        c.SetByMode(x, y, r, g, b, mode)
     }
 }
 
-func (c *Canvas) LineVertical(x, y1, y2 int, r, g, b uint8, mode string) {
+func (c *Canvas) LineVertical(x, y1, y2 int, r, g, b uint8, mode int) {
 
     if y1 > y2 {
         y1, y2 = y2, y1
     }
 
-    if mode == "set" {
-        col := color.NRGBA{r, g, b, 255}
-        for y := y1 ; y <= y2 ; y++ {
-            c.field.Set(x, y, col)          // Optimise by using the image library's built-in Set()
-        }
-    } else if mode == "add" {
-        for y := y1 ; y <= y2 ; y++ {
-            c.Add(x, y, r, g, b)
-        }
-    } else if mode == "subtract" {
-        for y := y1 ; y <= y2 ; y++ {
-            c.Subtract(x, y, r, g, b)
-        }
-    } else {
-        panic("unknown mode")
+    for y := y1 ; y <= y2 ; y++ {
+        c.SetByMode(x, y, r, g, b, mode)
     }
 }
+
+func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+
+    if x1 == x2 {
+        c.LineVertical(x1, y1, y2, r, g, b, mode)
+        return
+    }
+    if y1 == y2 {
+        c.LineHorizontal(x1, y1, x2, r, g, b, mode)
+        return
+    }
+
+    dx := x1 - x2
+    dy := y1 - y2
+    if dx < 0 { dx *= -1 }
+    if dy < 0 { dy *= -1 }
+
+    if dy < dx {
+        c.lineGentle(x1, y1, x2, y2, r, g, b, mode)
+    } else {
+        c.lineSteep(x1, y1, x2, y2, r, g, b, mode)
+    }
+}
+
+func (c *Canvas) lineGentle(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+
+    var additive int
+
+    if x1 > x2 {
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+    }
+
+    if (y1 < y2) {
+        additive = 1;
+    } else {
+        additive = -1;
+    }
+
+    dy_times_two := (y2 - y1) * 2
+    if dy_times_two < 0 { dy_times_two *= -1 }
+
+    dx_times_two := (x2 - x1) * 2       // We know we're going right, no need to check for < 0
+
+    the_error := x1 - x2
+
+    for n := x1 ; n <= x2 ; n++ {
+
+        c.SetByMode(n, y1, r, g, b, mode)
+
+        the_error += dy_times_two;
+        if the_error > 0 {
+            y1 += additive
+            the_error -= dx_times_two
+        }
+    }
+}
+
+
+func (c *Canvas) lineSteep(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+
+    var additive int
+
+    if y1 > y2 {
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+    }
+
+    if (x1 < x2) {
+        additive = 1;
+    } else {
+        additive = -1;
+    }
+
+    dy_times_two := (y2 - y1) * 2       // We know we're going down, no need to check for < 0
+
+    dx_times_two := (x2 - x1) * 2
+    if dx_times_two < 0 { dx_times_two *= -1 }
+
+    the_error := y1 - y2;
+
+    for n := y1 ; n <= y2 ; n++ {
+
+        c.SetByMode(x1, n, r, g, b, mode)
+
+        the_error += dx_times_two
+        if the_error > 0 {
+            x1 += additive
+            the_error -= dy_times_two
+        }
+    }
+}
+
 
 func (c *Canvas) AddCanvas(other *Canvas) {
     if c.width != other.width || c.height != other.height {
