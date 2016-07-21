@@ -96,18 +96,18 @@ func (c *Canvas) Clear(r, g, b uint8) {
     }
 }
 
-func (c *Canvas) Frect(left, top, right, bottom int, r, g, b uint8, mode int) {
+func (c *Canvas) Frect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
-    if left > right {
-        left, right = right, left
+    if x1 > x2 {
+        x1, x2 = x2, x1
     }
 
-    if top > bottom {
-        top, bottom = bottom, top
+    if y1 > y2 {
+        y1, y2 = y2, y1
     }
 
-    for x := left ; x < right ; x++ {
-        for y := top ; y < bottom ; y++ {
+    for x := x1 ; x < x2 ; x++ {
+        for y := y1 ; y < y2 ; y++ {
             c.SetByMode(x, y, r, g, b, mode)
         }
     }
@@ -207,7 +207,6 @@ func (c *Canvas) lineGentle(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
     }
 }
 
-
 func (c *Canvas) lineSteep(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
     var additive int
@@ -242,7 +241,6 @@ func (c *Canvas) lineSteep(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
     }
 }
 
-
 func (c *Canvas) AddCanvas(other *Canvas) {
     if c.width != other.width || c.height != other.height {
         panic("dimensions did not match for AddCanvas")
@@ -255,7 +253,6 @@ func (c *Canvas) AddCanvas(other *Canvas) {
         }
     }
 }
-
 
 func (c *Canvas) DumpPNG(filename string) error {
     outfile, err := os.Create(filename)
