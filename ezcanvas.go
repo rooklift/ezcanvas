@@ -74,7 +74,7 @@ func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
     c.field.Set(x, y, color.NRGBA{new_r, new_g, new_b, 255})
 }
 
-func (c *Canvas) Rect(left, top, right, bottom int, r, g, b uint8, mode string) {
+func (c *Canvas) Frect(left, top, right, bottom int, r, g, b uint8, mode string) {
 
     if left > right {
         left, right = right, left
@@ -132,7 +132,7 @@ func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode string) {
     if mode == "set" {
         col := color.NRGBA{r, g, b, 255}
         for x := x1 ; x <= x2 ; x++ {
-            c.field.Set(x, y, col)
+            c.field.Set(x, y, col)          // Optimise by using the image library's built-in Set()
         }
     } else if mode == "add" {
         for x := x1 ; x <= x2 ; x++ {
@@ -140,6 +140,30 @@ func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode string) {
         }
     } else if mode == "subtract" {
         for x := x1 ; x <= x2 ; x++ {
+            c.Subtract(x, y, r, g, b)
+        }
+    } else {
+        panic("unknown mode")
+    }
+}
+
+func (c *Canvas) LineVertical(x, y1, y2 int, r, g, b uint8, mode string) {
+
+    if y1 > y2 {
+        y1, y2 = y2, y1
+    }
+
+    if mode == "set" {
+        col := color.NRGBA{r, g, b, 255}
+        for y := y1 ; y <= y2 ; y++ {
+            c.field.Set(x, y, col)          // Optimise by using the image library's built-in Set()
+        }
+    } else if mode == "add" {
+        for y := y1 ; y <= y2 ; y++ {
+            c.Add(x, y, r, g, b)
+        }
+    } else if mode == "subtract" {
+        for y := y1 ; y <= y2 ; y++ {
             c.Subtract(x, y, r, g, b)
         }
     } else {
