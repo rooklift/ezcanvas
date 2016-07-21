@@ -128,36 +128,14 @@ func (c *Canvas) Fcircle(x, y, radius int, r, g, b uint8, mode int) {
     }
 }
 
-func (c *Canvas) LineHorizontal(x1, y, x2 int, r, g, b uint8, mode int) {
-
-    if x1 > x2 {
-        x1, x2 = x2, x1
-    }
-
-    for x := x1 ; x <= x2 ; x++ {
-        c.SetByMode(x, y, r, g, b, mode)
-    }
-}
-
-func (c *Canvas) LineVertical(x, y1, y2 int, r, g, b uint8, mode int) {
-
-    if y1 > y2 {
-        y1, y2 = y2, y1
-    }
-
-    for y := y1 ; y <= y2 ; y++ {
-        c.SetByMode(x, y, r, g, b, mode)
-    }
-}
-
 func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
     if x1 == x2 {
-        c.LineVertical(x1, y1, y2, r, g, b, mode)
+        c.lineVertical(x1, y1, y2, r, g, b, mode)
         return
     }
     if y1 == y2 {
-        c.LineHorizontal(x1, y1, x2, r, g, b, mode)
+        c.lineHorizontal(x1, y1, x2, r, g, b, mode)
         return
     }
 
@@ -170,6 +148,28 @@ func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
         c.lineGentle(x1, y1, x2, y2, r, g, b, mode)
     } else {
         c.lineSteep(x1, y1, x2, y2, r, g, b, mode)
+    }
+}
+
+func (c *Canvas) lineHorizontal(x1, y, x2 int, r, g, b uint8, mode int) {
+
+    if x1 > x2 {
+        x1, x2 = x2, x1
+    }
+
+    for x := x1 ; x <= x2 ; x++ {
+        c.SetByMode(x, y, r, g, b, mode)
+    }
+}
+
+func (c *Canvas) lineVertical(x, y1, y2 int, r, g, b uint8, mode int) {
+
+    if y1 > y2 {
+        y1, y2 = y2, y1
+    }
+
+    for y := y1 ; y <= y2 ; y++ {
+        c.SetByMode(x, y, r, g, b, mode)
     }
 }
 
