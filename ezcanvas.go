@@ -26,6 +26,7 @@ type Canvas struct {
     field *image.NRGBA      // https://golang.org/pkg/image/#NRGBA
     width int
     height int
+    arraylen int            // is equivalent to len(c.field.Pix), the total number of r/g/b/a values, i.e. pixels * 4
 }
 
 // The image.NRGBA has a .Pix field that holds the actual pixels. From the docs:
@@ -40,9 +41,9 @@ type Canvas struct {
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
 
-    if x >= 0 && x < c.width && y >= 0 && y < c.height {
+    index := y * c.field.Stride + x * 4
+    if index >= 0 && index < c.arraylen - 3 {
 
-        index := y * c.field.Stride + x * 4
         r := c.field.Pix[index]
 
         index++
@@ -70,9 +71,9 @@ func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
 
 func (c *Canvas) Set(x, y int, r, g, b uint8) {
 
-    if x >= 0 && x < c.width && y >= 0 && y < c.height {
+    index := y * c.field.Stride + x * 4
+    if index >= 0 && index < c.arraylen - 3 {
 
-        index := y * c.field.Stride + x * 4
         c.field.Pix[index] = r
 
         index++
@@ -357,6 +358,7 @@ func NewCanvas(width int, height int) *Canvas {
                 field : image.NewNRGBA(image.Rect(0, 0, width, height)),
                 width : width,
                 height : height,
+                arraylen : width * height * 4,
     }
     canvas.Clear(0, 0, 0)
     return &canvas
