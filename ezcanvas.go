@@ -1,11 +1,12 @@
-// ezcanvas is a wrapper around some of Golang's "image" package, simplifying the creation of simple PNGs.
+// ezcanvas is a wrapper around some of Golang's "image" package, simplifying the creation of simple images.
+// i.e. the sort of image that can be created from simple shapes like rectangles, circles, lines.
+// At the moment transparency has been removed for simplicity's sake.
 
 package ezcanvas
 
 import (
     "fmt"
     "image"
-    "image/color"
     "image/png"
     "math"
     "os"
@@ -26,6 +27,16 @@ type Canvas struct {
     width int
     height int
 }
+
+// The image.NRGBA has a .Pix field that holds the actual pixels. From the docs:
+//
+//      Pix holds the image's pixels, in R, G, B, A order. The pixel at
+//      (x, y) starts at Pix[(y-Rect.Min.Y)*Stride + (x-Rect.Min.X)*4].
+//
+// Since we're always having the Min.X and Min.Y == 0, this simplifies to:
+//
+//      Pix[y * Stride + x * 4]
+
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
@@ -52,10 +63,13 @@ func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
 }
 
 func (c *Canvas) Set(x, y int, r, g, b uint8) {
-    r_index := y * c.field.Stride + x * 4
-    g_index := r_index + 1
-    b_index := r_index + 2
-    c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index] = r, g, b
+
+    if x >= 0 && x < c.width && y >= 0 && y < c.height {
+        r_index := y * c.field.Stride + x * 4
+        g_index := r_index + 1
+        b_index := r_index + 2
+        c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index] = r, g, b
+    }
 }
 
 func (c *Canvas) Add(x, y int, r, g, b uint8) {
@@ -72,7 +86,7 @@ func (c *Canvas) Add(x, y int, r, g, b uint8) {
     if new_g < g { new_g = 255 }
     if new_b < b { new_b = 255 }
 
-    c.field.Set(x, y, color.NRGBA{new_r, new_g, new_b, 255})
+    c.Set(x, y, new_r, new_g, new_b)
 }
 
 func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
@@ -89,15 +103,13 @@ func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
     if new_g > g { new_g = 0 }
     if new_b > b { new_b = 0 }
 
-    c.field.Set(x, y, color.NRGBA{new_r, new_g, new_b, 255})
+    c.Set(x, y, new_r, new_g, new_b)
 }
 
 func (c *Canvas) Clear(r, g, b uint8) {
-    col := color.NRGBA{r, g, b, 255}
-
     for x := 0 ; x < c.width ; x++ {
         for y := 0 ; y < c.height ; y++ {
-            c.field.Set(x, y, col)
+            c.Set(x, y, r, g, b)
         }
     }
 }
