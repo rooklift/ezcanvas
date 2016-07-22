@@ -39,15 +39,21 @@ type Canvas struct {
 
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
+
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
-        r_index := y * c.field.Stride + x * 4
-        g_index := r_index + 1
-        b_index := r_index + 2
-        r, g, b := c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index]
+
+        index := y * c.field.Stride + x * 4
+        r := c.field.Pix[index]
+
+        index++
+        g := c.field.Pix[index]
+
+        index++
+        b := c.field.Pix[index]
+
         return r, g, b
-    } else {
-        return 0, 0, 0
     }
+    return 0, 0, 0
 }
 
 func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
@@ -65,10 +71,18 @@ func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
 func (c *Canvas) Set(x, y int, r, g, b uint8) {
 
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
-        r_index := y * c.field.Stride + x * 4
-        g_index := r_index + 1
-        b_index := r_index + 2
-        c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index] = r, g, b
+
+        index := y * c.field.Stride + x * 4
+        c.field.Pix[index] = r
+
+        index++
+        c.field.Pix[index] = g
+
+        index++
+        c.field.Pix[index] = b
+
+        index++
+        c.field.Pix[index] = 255        // alpha value : fully opaque
     }
 }
 
