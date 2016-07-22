@@ -41,9 +41,9 @@ type Canvas struct {
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
 
-    index := y * c.field.Stride + x * 4
-    if index >= 0 && index < c.arraylen - 3 {
+    if x >= 0 && x < c.width && y >= 0 && y < c.height {
 
+        index := y * c.field.Stride + x * 4
         r := c.field.Pix[index]
 
         index++
@@ -71,9 +71,9 @@ func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
 
 func (c *Canvas) Set(x, y int, r, g, b uint8) {
 
-    index := y * c.field.Stride + x * 4
-    if index >= 0 && index < c.arraylen - 3 {
+    if x >= 0 && x < c.width && y >= 0 && y < c.height {
 
+        index := y * c.field.Stride + x * 4
         c.field.Pix[index] = r
 
         index++
