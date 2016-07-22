@@ -6,4 +6,3 @@ Example programmes are at https://github.com/fohristiwhirl/ezcanvas_examples
 TODO:
 
 * Empty circle
-* Empty rectangle
