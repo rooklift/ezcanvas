@@ -22,23 +22,26 @@ const (
 )
 
 type Canvas struct {
-    field *image.NRGBA          // When field.At() is called it returns a color.NRGBA, which we can type assert
+    field *image.NRGBA      // https://golang.org/pkg/image/#NRGBA
     width int
     height int
 }
 
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
-        at := c.field.At(x, y)
-        r, g, b := at.(color.NRGBA).R, at.(color.NRGBA).G, at.(color.NRGBA).B   // (color.NRGBA) is the aforementioned type assertion
+        r_index := y * c.field.Stride + x * 4
+        g_index := r_index + 1
+        b_index := r_index + 2
+        r, g, b := c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index]
         return r, g, b
+    } else {
+        return 0, 0, 0
     }
-    return 0, 0, 0
 }
 
 func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
     if mode == SET {
-        c.field.Set(x, y, color.NRGBA{r, g, b, 255})        // Optimise by using the image library's built-in Set()
+        c.Set(x, y, r, g, b)
     } else if mode == ADD {
         c.Add(x, y, r, g, b)
     } else if mode == SUBTRACT {
@@ -49,7 +52,10 @@ func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
 }
 
 func (c *Canvas) Set(x, y int, r, g, b uint8) {
-    c.field.Set(x, y, color.NRGBA{r, g, b, 255})
+    r_index := y * c.field.Stride + x * 4
+    g_index := r_index + 1
+    b_index := r_index + 2
+    c.field.Pix[r_index], c.field.Pix[g_index], c.field.Pix[b_index] = r, g, b
 }
 
 func (c *Canvas) Add(x, y int, r, g, b uint8) {
@@ -128,7 +134,7 @@ func (c *Canvas) Rect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
     c.lineVertical(x1, y1, y2, r, g, b, mode)
     c.lineVertical(x2, y1, y2, r, g, b, mode)
 
-}    
+}
 
 func (c *Canvas) Fcircle(x, y, radius int, r, g, b uint8, mode int) {
     var pyth float64;
