@@ -347,9 +347,13 @@ func (c *Canvas) AddCanvas(other *Canvas) {
 func (c *Canvas) DumpPNG(filename string) error {
     outfile, err := os.Create(filename)
     if err != nil {
+        if outfile != nil {
+            outfile.Close()
+        }
         return fmt.Errorf("Couldn't create output file '%s'", filename)
     }
     png.Encode(outfile, c.field)
+    outfile.Close()
     return nil
 }
 
