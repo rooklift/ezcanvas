@@ -89,34 +89,34 @@ func (c *Canvas) Set(x, y int, r, g, b uint8) {
 
 func (c *Canvas) Add(x, y int, r, g, b uint8) {
 
-    new_r, new_g, new_b := c.Get(x, y)
+    old_r, old_g, old_b := c.Get(x, y)
 
-    new_r += r
-    new_g += g
-    new_b += b
+    new_r := old_r + r
+    new_g := old_g + g
+    new_b := old_b + b
 
     // In case of overflows, set to max value instead...
 
-    if new_r < r { new_r = 255 }
-    if new_g < g { new_g = 255 }
-    if new_b < b { new_b = 255 }
+    if new_r < old_r { new_r = 255 }
+    if new_g < old_g { new_g = 255 }
+    if new_b < old_b { new_b = 255 }
 
     c.Set(x, y, new_r, new_g, new_b)
 }
 
 func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
 
-    new_r, new_g, new_b := c.Get(x, y)
+    old_r, old_g, old_b := c.Get(x, y)
 
-    new_r -= r
-    new_g -= g
-    new_b -= b
+    new_r := old_r - r
+    new_g := old_g - g
+    new_b := old_b - b
 
     // In case of underflows, set to min value instead...
 
-    if new_r > r { new_r = 0 }
-    if new_g > g { new_g = 0 }
-    if new_b > b { new_b = 0 }
+    if new_r > old_r { new_r = 0 }
+    if new_g > old_g { new_g = 0 }
+    if new_b > old_b { new_b = 0 }
 
     c.Set(x, y, new_r, new_g, new_b)
 }
