@@ -215,6 +215,122 @@ func (c *Canvas) Circle(x, y, radius int, r, g, b uint8, mode int) {
     }
 }
 
+func (c *Canvas) Triangle(x1, y1, x2, y2, x3, y3 int, r, g, b uint8, mode int) {
+
+    // FIXME? This is not quite right as pixels on the corners get hit twice...
+
+    c.Line(x1, y1, x2, y2, r, g, b, mode)
+    c.Line(x1, y1, x3, y3, r, g, b, mode)
+    c.Line(x2, y2, x3, y3, r, g, b, mode)
+}
+
+func (c *Canvas) Ftriangle(x1, y1, x2, y2, x3, y3 int, r, g, b uint8, mode int) {
+
+    top_y := min_of_3(y1, y2, y3)
+    bottom_y := max_of_3(y1, y2, y3)
+
+    // Handle cases where the whole thing is a horizontal or vertical line...
+
+    if x1 == x2 && x2 == x3 {
+        c.lineVertical(x1, top_y, bottom_y, r, g, b, mode)
+        return
+    }
+
+    if y1 == y2 && y2 == y3 {
+        left_x := min_of_3(x1, x2, x3)
+        right_x := max_of_3(x1, x2, x3)
+        c.lineHorizontal(left_x, y1, right_x, r, g, b, mode)
+        return
+    }
+
+    for y := top_y ; y <= bottom_y ; y++ {
+
+        // Find intercepts for this y...
+
+        x_intercepts := make([]int, 0, 2)
+
+        i_one, err := intercept_x(y, x1, y1, x2, y2)
+        if err == nil {
+            x_intercepts = append(x_intercepts, i_one)
+        }
+
+        i_two, err := intercept_x(y, x1, y1, x3, y3)
+        if err == nil {
+            x_intercepts = append(x_intercepts, i_two)
+        }
+
+        i_three, err := intercept_x(y, x2, y2, x3, y3)
+        if err == nil {
+            x_intercepts = append(x_intercepts, i_three)
+        }
+
+        // Draw...
+
+        if len(x_intercepts) == 1 {
+
+            c.SetByMode(x_intercepts[0], y, r, g, b, mode)
+
+        } else if len(x_intercepts) == 2 {
+
+            c.lineHorizontal(x_intercepts[0], y, x_intercepts[1], r, g, b, mode)
+
+        } else if len(x_intercepts) == 3 {
+
+            left_x := min_of_3(x_intercepts[0], x_intercepts[1], x_intercepts[2])
+            right_x := max_of_3(x_intercepts[0], x_intercepts[1], x_intercepts[2])
+            c.lineHorizontal(left_x, y, right_x, r, g, b, mode)
+
+        }
+    }
+}
+
+func min_of_3(a, b, c int) int {
+    if a < b && a < c {
+        return a
+    }
+    if b < c {
+        return b
+    }
+    return c
+}
+
+func max_of_3(a, b, c int) int {
+    if a > b && a > c {
+        return a
+    }
+    if b > c {
+        return b
+    }
+    return c
+}
+
+func intercept_x(main_y, x1, y1, x2, y2 int) (int, error) {
+
+    // No intercept?
+
+    if (y1 < main_y && y2 < main_y) || (y1 > main_y && y2 > main_y) {
+        return 0, fmt.Errorf("intercept_x: no intercept")
+    }
+
+    // Entire line is identical?
+
+    if y1 == y2 {
+        return 0, fmt.Errorf("intercept_x: lines are identical")
+    }
+
+    // There is a normal intercept...
+
+    if y2 < y1 {
+        x1, y1, x2, y2 = x2, y2, x1, y1
+    }
+
+    fraction := float64(main_y - y1) / float64(y2 - y1)
+
+    intercept_f := float64(x2 - x1) * fraction + float64(x1)
+
+    return int(intercept_f), nil
+}
+
 func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
     if x1 == x2 {
