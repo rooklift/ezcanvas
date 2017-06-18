@@ -12,8 +12,8 @@ func (c *Canvas) Fpolygon(r, g, b uint8, mode int, args... int) {
 
 func (c *Canvas) draw_polygon(r, g, b uint8, mode int, filled bool, args... int) {
 
-    if len(args) < 4 {
-        return
+    if len(args) < 6 {
+        panic("draw_polygon() needs 3 or more points")
     }
 
     pol := newPolygon()
