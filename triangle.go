@@ -15,13 +15,13 @@ func (c *Canvas) triangle(x1, y1, x2, y2, x3, y3 int, r, g, b uint8, mode int, f
 
     p := newPolygon()
 
-    p.Line(x1, y1, x2, y2)
-    p.Line(x1, y1, x3, y3)
-    p.Line(x2, y2, x3, y3)
+    p.line(x1, y1, x2, y2)
+    p.line(x1, y1, x3, y3)
+    p.line(x2, y2, x3, y3)
 
     if filled {
-        p.DrawFilled(c, r, g, b, mode)
+        p.drawFilled(c, r, g, b, mode)
     } else {
-        p.DrawEdges(c, r, g, b, mode)
+        p.drawEdges(c, r, g, b, mode)
     }
 }

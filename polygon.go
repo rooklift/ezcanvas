@@ -1,174 +1,42 @@
 package ezcanvas
 
-// Some helpers to draw convex polygons only.
+// Works correctly for convex polygons only
 
-type point struct {
-    x int
-    y int
+func (c *Canvas) Polygon(r, g, b uint8, mode int, args... int) {
+    c.draw_polygon(r, g, b, mode, false, args...)
 }
 
-type left_and_right struct {
-    left int
-    right int
+func (c *Canvas) Fpolygon(r, g, b uint8, mode int, args... int) {
+    c.draw_polygon(r, g, b, mode, true, args...)
 }
 
-type polygon struct {
-    edge_points map[point]bool          // All points that make up the edges of the polygon
-    extremes map[int]left_and_right     // Extreme left and right x values of the polygon for any given y value
-}
+func (c *Canvas) draw_polygon(r, g, b uint8, mode int, filled bool, args... int) {
 
-func newPolygon() *polygon {
-    r := polygon{}
-    r.edge_points = make(map[point]bool)
-    r.extremes = make(map[int]left_and_right)
-    return &r
-}
-
-func (c *polygon) Line(x1, y1, x2, y2 int) {
-
-    if x1 == x2 {
-        c.lineVertical(x1, y1, y2)
-        return
-    }
-    if y1 == y2 {
-        c.lineHorizontal(x1, y1, x2)
+    if len(args) < 4 {
         return
     }
 
-    dx := x1 - x2
-    dy := y1 - y2
-    if dx < 0 { dx *= -1 }
-    if dy < 0 { dy *= -1 }
+    pol := newPolygon()
 
-    if dy < dx {
-        c.lineGentle(x1, y1, x2, y2)
+    last_x := args[0]
+    last_y := args[1]
+
+    for n := 2 ; n < len(args) - 1 ; n += 2 {
+
+        next_x := args[n]
+        next_y := args[n + 1]
+
+        pol.line(last_x, last_y, next_x, next_y)
+
+        last_x = next_x
+        last_y = next_y
+    }
+
+    pol.line(last_x, last_y, args[0], args[1])
+
+    if filled {
+        pol.drawFilled(c, r, g, b, mode)
     } else {
-        c.lineSteep(x1, y1, x2, y2)
-    }
-}
-
-func (c *polygon) lineHorizontal(x1, y, x2 int) {
-
-    if x1 > x2 {
-        x1, x2 = x2, x1
-    }
-
-    for x := x1 ; x <= x2 ; x++ {
-        c.Set(x, y)
-    }
-}
-
-func (c *polygon) lineVertical(x, y1, y2 int) {
-
-    if y1 > y2 {
-        y1, y2 = y2, y1
-    }
-
-    for y := y1 ; y <= y2 ; y++ {
-        c.Set(x, y)
-    }
-}
-
-func (c *polygon) lineGentle(x1, y1, x2, y2 int) {
-
-    // Based on an algorithm I read on the web 15 years ago;
-    // The webpage has long since vanished.
-
-    var additive int
-
-    if x1 > x2 {
-        x1, x2 = x2, x1
-        y1, y2 = y2, y1
-    }
-
-    if (y1 < y2) {
-        additive = 1;
-    } else {
-        additive = -1;
-    }
-
-    dy_times_two := (y2 - y1) * 2
-    if dy_times_two < 0 { dy_times_two *= -1 }
-
-    dx_times_two := (x2 - x1) * 2       // We know we're going right, no need to check for < 0
-
-    the_error := x1 - x2
-
-    for n := x1 ; n <= x2 ; n++ {
-
-        c.Set(n, y1)
-
-        the_error += dy_times_two;
-        if the_error > 0 {
-            y1 += additive
-            the_error -= dx_times_two
-        }
-    }
-}
-
-func (c *polygon) lineSteep(x1, y1, x2, y2 int) {
-
-    var additive int
-
-    if y1 > y2 {
-        x1, x2 = x2, x1
-        y1, y2 = y2, y1
-    }
-
-    if (x1 < x2) {
-        additive = 1;
-    } else {
-        additive = -1;
-    }
-
-    dy_times_two := (y2 - y1) * 2       // We know we're going down, no need to check for < 0
-
-    dx_times_two := (x2 - x1) * 2
-    if dx_times_two < 0 { dx_times_two *= -1 }
-
-    the_error := y1 - y2;
-
-    for n := y1 ; n <= y2 ; n++ {
-
-        c.Set(x1, n)
-
-        the_error += dx_times_two
-        if the_error > 0 {
-            x1 += additive
-            the_error -= dy_times_two
-        }
-    }
-}
-
-func (c *polygon) Set(x, y int) {
-
-    c.edge_points[point{x, y}] = true
-
-    extremes, ok := c.extremes[y]
-
-    if ok == false {
-
-        c.extremes[y] = left_and_right{x, x}
-
-    } else {
-
-        if extremes.left > x { extremes.left = x }
-        if extremes.right < x { extremes.right = x }
-
-        c.extremes[y] = extremes
-    }
-}
-
-func (c *polygon) DrawEdges(canvas *Canvas, r, g, b uint8, mode int) {
-    for point := range c.edge_points {
-        canvas.SetByMode(point.x, point.y, r, g, b, mode)
-    }
-}
-
-func (c *polygon) DrawFilled(canvas *Canvas, r, g, b uint8, mode int) {
-    for y, extremes := range c.extremes {
-        for x := extremes.left ; x <= extremes.right ; x++ {
-            canvas.SetByMode(x, y, r, g, b, mode)
-        }
+        pol.drawEdges(c, r, g, b, mode)
     }
 }
