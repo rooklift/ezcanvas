@@ -19,20 +19,20 @@ type polygon struct {
 }
 
 func newPolygon() *polygon {
-    r := polygon{}
-    r.edge_points = make(map[point]bool)
-    r.extremes = make(map[int]left_and_right)
-    return &r
+    p := polygon{}
+    p.edge_points = make(map[point]bool)
+    p.extremes = make(map[int]left_and_right)
+    return &p
 }
 
-func (c *polygon) line(x1, y1, x2, y2 int) {
+func (p *polygon) line(x1, y1, x2, y2 int) {
 
     if x1 == x2 {
-        c.lineVertical(x1, y1, y2)
+        p.lineVertical(x1, y1, y2)
         return
     }
     if y1 == y2 {
-        c.lineHorizontal(x1, y1, x2)
+        p.lineHorizontal(x1, y1, x2)
         return
     }
 
@@ -42,35 +42,35 @@ func (c *polygon) line(x1, y1, x2, y2 int) {
     if dy < 0 { dy *= -1 }
 
     if dy < dx {
-        c.lineGentle(x1, y1, x2, y2)
+        p.lineGentle(x1, y1, x2, y2)
     } else {
-        c.lineSteep(x1, y1, x2, y2)
+        p.lineSteep(x1, y1, x2, y2)
     }
 }
 
-func (c *polygon) lineHorizontal(x1, y, x2 int) {
+func (p *polygon) lineHorizontal(x1, y, x2 int) {
 
     if x1 > x2 {
         x1, x2 = x2, x1
     }
 
     for x := x1 ; x <= x2 ; x++ {
-        c.set(x, y)
+        p.set(x, y)
     }
 }
 
-func (c *polygon) lineVertical(x, y1, y2 int) {
+func (p *polygon) lineVertical(x, y1, y2 int) {
 
     if y1 > y2 {
         y1, y2 = y2, y1
     }
 
     for y := y1 ; y <= y2 ; y++ {
-        c.set(x, y)
+        p.set(x, y)
     }
 }
 
-func (c *polygon) lineGentle(x1, y1, x2, y2 int) {
+func (p *polygon) lineGentle(x1, y1, x2, y2 int) {
 
     // Based on an algorithm I read on the web 15 years ago;
     // The webpage has long since vanished.
@@ -97,7 +97,7 @@ func (c *polygon) lineGentle(x1, y1, x2, y2 int) {
 
     for n := x1 ; n <= x2 ; n++ {
 
-        c.set(n, y1)
+        p.set(n, y1)
 
         the_error += dy_times_two;
         if the_error > 0 {
@@ -107,7 +107,7 @@ func (c *polygon) lineGentle(x1, y1, x2, y2 int) {
     }
 }
 
-func (c *polygon) lineSteep(x1, y1, x2, y2 int) {
+func (p *polygon) lineSteep(x1, y1, x2, y2 int) {
 
     var additive int
 
@@ -131,7 +131,7 @@ func (c *polygon) lineSteep(x1, y1, x2, y2 int) {
 
     for n := y1 ; n <= y2 ; n++ {
 
-        c.set(x1, n)
+        p.set(x1, n)
 
         the_error += dx_times_two
         if the_error > 0 {
@@ -141,33 +141,33 @@ func (c *polygon) lineSteep(x1, y1, x2, y2 int) {
     }
 }
 
-func (c *polygon) set(x, y int) {
+func (p *polygon) set(x, y int) {
 
-    c.edge_points[point{x, y}] = true
+    p.edge_points[point{x, y}] = true
 
-    extremes, ok := c.extremes[y]
+    extremes, ok := p.extremes[y]
 
     if ok == false {
 
-        c.extremes[y] = left_and_right{x, x}
+        p.extremes[y] = left_and_right{x, x}
 
     } else {
 
         if extremes.left > x { extremes.left = x }
         if extremes.right < x { extremes.right = x }
 
-        c.extremes[y] = extremes
+        p.extremes[y] = extremes
     }
 }
 
-func (c *polygon) drawEdges(canvas *Canvas, r, g, b uint8, mode int) {
-    for point := range c.edge_points {
+func (p *polygon) drawEdges(canvas *Canvas, r, g, b uint8, mode int) {
+    for point := range p.edge_points {
         canvas.SetByMode(r, g, b, mode, point.x, point.y)
     }
 }
 
-func (c *polygon) drawFilled(canvas *Canvas, r, g, b uint8, mode int) {
-    for y, extremes := range c.extremes {
+func (p *polygon) drawFilled(canvas *Canvas, r, g, b uint8, mode int) {
+    for y, extremes := range p.extremes {
         for x := extremes.left ; x <= extremes.right ; x++ {
             canvas.SetByMode(r, g, b, mode, x, y)
         }
