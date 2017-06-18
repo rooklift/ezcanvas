@@ -1,6 +1,7 @@
 package ezcanvas
 
-// Some helpers to draw convex polygons only.
+// Some helpers to draw polygons.
+// Filled polygons work correctly for convex polygons only.
 
 type point struct {
     x int

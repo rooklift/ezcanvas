@@ -1,7 +1,5 @@
 package ezcanvas
 
-// Works correctly for convex polygons only
-
 func (c *Canvas) Polygon(r, g, b uint8, mode int, args... int) {
     c.draw_polygon(r, g, b, mode, false, args...)
 }
@@ -9,6 +7,8 @@ func (c *Canvas) Polygon(r, g, b uint8, mode int, args... int) {
 func (c *Canvas) Fpolygon(r, g, b uint8, mode int, args... int) {
     c.draw_polygon(r, g, b, mode, true, args...)
 }
+
+// Filled polygons work correctly for convex polygons only.
 
 func (c *Canvas) draw_polygon(r, g, b uint8, mode int, filled bool, args... int) {
 
