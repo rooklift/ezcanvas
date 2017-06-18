@@ -161,14 +161,14 @@ func (c *polygon) set(x, y int) {
 
 func (c *polygon) drawEdges(canvas *Canvas, r, g, b uint8, mode int) {
     for point := range c.edge_points {
-        canvas.SetByMode(point.x, point.y, r, g, b, mode)
+        canvas.SetByMode(r, g, b, mode, point.x, point.y)
     }
 }
 
 func (c *polygon) drawFilled(canvas *Canvas, r, g, b uint8, mode int) {
     for y, extremes := range c.extremes {
         for x := extremes.left ; x <= extremes.right ; x++ {
-            canvas.SetByMode(x, y, r, g, b, mode)
+            canvas.SetByMode(r, g, b, mode, x, y)
         }
     }
 }

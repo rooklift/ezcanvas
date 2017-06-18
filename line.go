@@ -1,13 +1,13 @@
 package ezcanvas
 
-func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+func (c *Canvas) Line(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
 
     if x1 == x2 {
-        c.lineVertical(x1, y1, y2, r, g, b, mode)
+        c.lineVertical(r, g, b, mode, x1, y1, y2)
         return
     }
     if y1 == y2 {
-        c.lineHorizontal(x1, y1, x2, r, g, b, mode)
+        c.lineHorizontal(r, g, b, mode, x1, y1, x2)
         return
     }
 
@@ -17,35 +17,35 @@ func (c *Canvas) Line(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
     if dy < 0 { dy *= -1 }
 
     if dy < dx {
-        c.lineGentle(x1, y1, x2, y2, r, g, b, mode)
+        c.lineGentle(r, g, b, mode, x1, y1, x2, y2)
     } else {
-        c.lineSteep(x1, y1, x2, y2, r, g, b, mode)
+        c.lineSteep(r, g, b, mode, x1, y1, x2, y2)
     }
 }
 
-func (c *Canvas) lineHorizontal(x1, y, x2 int, r, g, b uint8, mode int) {
+func (c *Canvas) lineHorizontal(r, g, b uint8, mode int, x1, y, x2 int) {
 
     if x1 > x2 {
         x1, x2 = x2, x1
     }
 
     for x := x1 ; x <= x2 ; x++ {
-        c.SetByMode(x, y, r, g, b, mode)
+        c.SetByMode(r, g, b, mode, x, y)
     }
 }
 
-func (c *Canvas) lineVertical(x, y1, y2 int, r, g, b uint8, mode int) {
+func (c *Canvas) lineVertical(r, g, b uint8, mode int, x, y1, y2 int) {
 
     if y1 > y2 {
         y1, y2 = y2, y1
     }
 
     for y := y1 ; y <= y2 ; y++ {
-        c.SetByMode(x, y, r, g, b, mode)
+        c.SetByMode(r, g, b, mode, x, y)
     }
 }
 
-func (c *Canvas) lineGentle(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+func (c *Canvas) lineGentle(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
 
     // Based on an algorithm I read on the web 15 years ago;
     // The webpage has long since vanished.
@@ -72,7 +72,7 @@ func (c *Canvas) lineGentle(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
     for n := x1 ; n <= x2 ; n++ {
 
-        c.SetByMode(n, y1, r, g, b, mode)
+        c.SetByMode(r, g, b, mode, n, y1)
 
         the_error += dy_times_two;
         if the_error > 0 {
@@ -82,7 +82,7 @@ func (c *Canvas) lineGentle(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
     }
 }
 
-func (c *Canvas) lineSteep(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
+func (c *Canvas) lineSteep(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
 
     var additive int
 
@@ -106,7 +106,7 @@ func (c *Canvas) lineSteep(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
 
     for n := y1 ; n <= y2 ; n++ {
 
-        c.SetByMode(x1, n, r, g, b, mode)
+        c.SetByMode(r, g, b, mode, x1, n)
 
         the_error += dx_times_two
         if the_error > 0 {

@@ -1,21 +1,17 @@
 package ezcanvas
 
-
 // FIXME? Not sure if I should follow the convention that
 // rectangle boundaries are off-by-one.
 
-
-func (c *Canvas) Rect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
-    c.rect(x1, y1, x2, y2, r, g, b, mode, false)
+func (c *Canvas) Rect(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
+    c.rect(r, g, b, mode, false, x1, y1, x2, y2)
 }
 
-
-func (c *Canvas) Frect(x1, y1, x2, y2 int, r, g, b uint8, mode int) {
-    c.rect(x1, y1, x2, y2, r, g, b, mode, true)
+func (c *Canvas) Frect(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
+    c.rect(r, g, b, mode, true, x1, y1, x2, y2)
 }
 
-
-func (c *Canvas) rect(x1, y1, x2, y2 int, r, g, b uint8, mode int, filled bool) {
+func (c *Canvas) rect(r, g, b uint8, mode int, filled bool, x1, y1, x2, y2 int) {
 
     p := newPolygon()
 

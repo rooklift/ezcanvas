@@ -56,19 +56,19 @@ func (c *Canvas) Get(x, y int) (r, g, b uint8) {
     return 0, 0, 0
 }
 
-func (c *Canvas) SetByMode(x, y int, r, g, b uint8, mode int) {
+func (c *Canvas) SetByMode(r, g, b uint8, mode int, x, y int) {
     if mode == SET {
-        c.Set(x, y, r, g, b)
+        c.Set(r, g, b, x, y)
     } else if mode == ADD {
-        c.Add(x, y, r, g, b)
+        c.Add(r, g, b, x, y)
     } else if mode == SUBTRACT {
-        c.Subtract(x, y, r, g, b)
+        c.Subtract(r, g, b, x, y)
     } else {
         panic("unknown mode")
     }
 }
 
-func (c *Canvas) Set(x, y int, r, g, b uint8) {
+func (c *Canvas) Set(r, g, b uint8, x, y int) {
 
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
 
@@ -86,7 +86,7 @@ func (c *Canvas) Set(x, y int, r, g, b uint8) {
     }
 }
 
-func (c *Canvas) Add(x, y int, r, g, b uint8) {
+func (c *Canvas) Add(r, g, b uint8, x, y int) {
 
     old_r, old_g, old_b := c.Get(x, y)
 
@@ -100,10 +100,10 @@ func (c *Canvas) Add(x, y int, r, g, b uint8) {
     if new_g < old_g { new_g = 255 }
     if new_b < old_b { new_b = 255 }
 
-    c.Set(x, y, new_r, new_g, new_b)
+    c.Set(new_r, new_g, new_b, x, y)
 }
 
-func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
+func (c *Canvas) Subtract(r, g, b uint8, x, y int) {
 
     old_r, old_g, old_b := c.Get(x, y)
 
@@ -117,13 +117,13 @@ func (c *Canvas) Subtract(x, y int, r, g, b uint8) {
     if new_g > old_g { new_g = 0 }
     if new_b > old_b { new_b = 0 }
 
-    c.Set(x, y, new_r, new_g, new_b)
+    c.Set(new_r, new_g, new_b, x, y)
 }
 
 func (c *Canvas) Clear(r, g, b uint8) {
     for x := 0 ; x < c.width ; x++ {
         for y := 0 ; y < c.height ; y++ {
-            c.Set(x, y, r, g, b)
+            c.Set(r, g, b, x, y)
         }
     }
 }
@@ -136,7 +136,7 @@ func (c *Canvas) AddCanvas(other *Canvas) {
     for x := 0 ; x < c.width ; x++ {
         for y := 0 ; y < c.height ; y++ {
             r, g, b := other.Get(x, y)
-            c.Add(x, y, r, g, b)
+            c.Add(r, g, b, x, y)
         }
     }
 }
