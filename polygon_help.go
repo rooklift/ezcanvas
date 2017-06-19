@@ -143,6 +143,9 @@ func (p *polygon) lineSteep(x1, y1, x2, y2 int) {
 
 func (p *polygon) set(x, y int) {
 
+    // Set a single point as being on the edge of the polygon,
+    // and update the data structure.
+
     p.edge_points[point{x, y}] = true
 
     extremes, ok := p.extremes[y]
