@@ -38,10 +38,6 @@ type Canvas struct {
 //      Pix[y * Stride + x * 4]
 
 
-func (c *Canvas) Field() *image.NRGBA {
-    return c.field
-}
-
 func (c *Canvas) Get(x, y int) (r, g, b uint8) {
 
     if x >= 0 && x < c.width && y >= 0 && y < c.height {
