@@ -7,6 +7,8 @@ package ezcanvas
 import (
     "fmt"
     "image"
+    "image/gif"
+    "image/jpeg"
     "image/png"
     "os"
 )
@@ -150,6 +152,32 @@ func (c *Canvas) DumpPNG(filename string) error {
         return fmt.Errorf("Couldn't create output file '%s'", filename)
     }
     png.Encode(outfile, c.field)
+    outfile.Close()
+    return nil
+}
+
+func (c *Canvas) DumpGIF(filename string) error {
+    outfile, err := os.Create(filename)
+    if err != nil {
+        if outfile != nil {
+            outfile.Close()
+        }
+        return fmt.Errorf("Couldn't create output file '%s'", filename)
+    }
+    gif.Encode(outfile, c.field, nil)
+    outfile.Close()
+    return nil
+}
+
+func (c *Canvas) DumpJPEG(filename string) error {
+    outfile, err := os.Create(filename)
+    if err != nil {
+        if outfile != nil {
+            outfile.Close()
+        }
+        return fmt.Errorf("Couldn't create output file '%s'", filename)
+    }
+    jpeg.Encode(outfile, c.field, nil)
     outfile.Close()
     return nil
 }
