@@ -5,11 +5,12 @@ package main
 
 import (
     "fmt"
-    "github.com/fohristiwhirl/ezcanvas"
     "math"
     "math/cmplx"
     "math/rand"
     "sync"
+
+    ezcanvas ".."
 )
 
 const (

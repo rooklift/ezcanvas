@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fohristiwhirl/ezcanvas"
+	ezcanvas ".."
 )
 
 const REPLACE = ezcanvas.REPLACE

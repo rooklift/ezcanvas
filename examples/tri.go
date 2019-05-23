@@ -1,9 +1,8 @@
 package main
 
 import (
-
 	"math/rand"
-	"github.com/fohristiwhirl/ezcanvas"
+	ezcanvas ".."
 )
 
 func main() {

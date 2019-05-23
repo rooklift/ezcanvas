@@ -7,7 +7,7 @@ import (
 	"math/cmplx"
 	"sync"
 
-	"github.com/fohristiwhirl/ezcanvas"
+	ezcanvas ".."
 )
 
 const (

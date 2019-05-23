@@ -1,8 +1,8 @@
 package main
 
 import (
-    "github.com/fohristiwhirl/ezcanvas"
     "math/rand"
+    ezcanvas ".."
 )
 
 const (
