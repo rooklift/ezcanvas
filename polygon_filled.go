@@ -34,22 +34,8 @@ func (p *polygon_filled) line(x1, y1, x2, y2 int) {
 }
 
 func (p *polygon_filled) lineHorizontal(x1, y, x2 int) {
-
-	var sx int
-
-	if x1 < x2 {
-		sx = 1
-	} else {
-		sx = -1
-	}
-
-	for {
-		p.note_edge_point(x1, y)
-		if x1 == x2 {
-			break
-		}
-		x1 += sx
-	}
+	p.note_edge_point(x1, y)
+	p.note_edge_point(x2, y)
 }
 
 func (p *polygon_filled) lineVertical(x, y1, y2 int) {
