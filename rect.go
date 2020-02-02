@@ -4,25 +4,21 @@ package ezcanvas
 // rectangle boundaries are off-by-one.
 
 func (c *Canvas) Rect(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
-    c.rect(r, g, b, mode, false, x1, y1, x2, y2)
+
+    if x1 > x2 { x1, x2 = x2, x1 }
+    if y1 > y2 { y1, y2 = y2, y1 }
+
+    c.Polygon(r, g, b, mode, x1, y1, x2 - 1, y1, x2 - 1, y2 - 1, x1, y2 - 1)
 }
 
 func (c *Canvas) Frect(r, g, b uint8, mode int, x1, y1, x2, y2 int) {
-    c.rect(r, g, b, mode, true, x1, y1, x2, y2)
-}
 
-func (c *Canvas) rect(r, g, b uint8, mode int, filled bool, x1, y1, x2, y2 int) {
+    if x1 > x2 { x1, x2 = x2, x1 }
+    if y1 > y2 { y1, y2 = y2, y1 }
 
-    p := newPolygon()
-
-    p.line(x1, y1, x1, y2)
-    p.line(x1, y1, x2, y1)
-    p.line(x1, y2, x2, y2)
-    p.line(x2, y1, x2, y2)
-
-    if filled {
-        p.drawFilled(c, r, g, b, mode)
-    } else {
-        p.drawEdges(c, r, g, b, mode)
+    for x := x1; x < x2; x++ {
+        for y := y1; y < y2; y++ {
+            c.SetByMode(r, g, b, mode, x, y)
+        }
     }
 }
