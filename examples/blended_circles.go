@@ -1,7 +1,7 @@
 package main
 
 import (
-    ezcanvas ".."
+    ezcanvas "github.com/rooklift/ezcanvas"
 )
 
 const MODE = ezcanvas.REPLACE
